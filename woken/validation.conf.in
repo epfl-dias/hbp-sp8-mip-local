@@ -1,0 +1,42 @@
+akka {
+  loglevel = INFO
+
+  actor {
+    provider = "akka.cluster.ClusterActorRefProvider"
+    debug {
+      receive = on
+      autoreceive = on
+      lifecycle = on
+      fsm = on
+    }
+  }
+
+  remote {
+    maximum-payload-bytes = 10000000 bytes
+    enabled-transports = [ "akka.remote.netty.tcp" ]
+    netty.tcp {
+
+      hostname = WOKEN_VALIDATION_HOST  # external (logical) hostname
+      port = WOKEN_VALIDATION_PORT      # external (logical) port
+
+      bind-hostname = localhost         # internal (bind) hostname
+      bind-port = WOKEN_VALIDATION_PORT # internal (bind) port
+
+      message-frame-size = 10000000b
+      send-buffer-size = 10000000b
+      receive-buffer-size = 10000000b
+      maximum-frame-size = 10000000b
+    }
+  }
+
+  cluster {
+    seed-nodes = [ "akka.tcp://woken@WOKEN_HOST:WOKEN_PORT1" ]
+
+    roles = [ "validation" ]
+
+    #role {
+    #  woken.min-nr-of-members = 1
+    #  validation.min-nr-of-members = 1
+    #}
+  }
+}

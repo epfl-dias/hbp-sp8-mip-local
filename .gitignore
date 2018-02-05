@@ -1,0 +1,10 @@
+.*
+!.gitignore
+settings.local.*
+data
+portainer
+postgres
+mesos-master
+mesos-slave
+woken/application.conf
+woken/validation.conf

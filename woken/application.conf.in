@@ -1,0 +1,172 @@
+
+# Sample configuration for local execution of the woken
+
+akka {
+  log-dead-letters = 1
+  log-dead-letters-during-shutdown = off
+  loglevel = INFO
+
+  actor {
+    provider = "akka.cluster.ClusterActorRefProvider"
+    debug {
+      receive = on
+      autoreceive = off
+      lifecycle = on
+      fsm = on
+      unhandled = on
+      event-stream = off
+    }
+  }
+
+  remote {
+    log-sent-messages = off
+    log-received-messages = off
+    log-remote-lifecycle-events = off
+
+    maximum-payload-bytes = 10000000 bytes
+    enabled-transports = [ "akka.remote.netty.tcp" ]
+
+    netty.tcp {
+
+      hostname = WOKEN_HOST        # external (logical) hostname
+      port = WOKEN_PORT1           # external (logical) port
+
+      bind-hostname = localhost    # internal (bind) hostname
+      bind-port = WOKEN_PORT1      # internal (bind) port
+
+      message-frame-size = 10000000b
+      send-buffer-size = 10000000b
+      receive-buffer-size = 10000000b
+      maximum-frame-size = 10000000b
+    }
+  }
+
+  cluster {
+    seed-nodes = [ "akka.tcp://woken@WOKEN_HOST:WOKEN_PORT1" ]
+
+    roles = [ "woken" ]
+  }
+}
+
+spray.can.server {
+  idle-timeout = 300s
+  request-timeout = 180s
+  ssl-encryption = off
+  ssl-tracing = on
+}
+
+spray.can.client {
+  request-timeout = 20s
+  chunkless-streaming = off
+  connecting-timeout = 10s
+}
+
+spray.can.host-connector {
+  max-connections = 5
+  host-connector.max-retries = 2
+  pipelining = on
+}
+
+app {
+  clusterSystemName = "woken"
+  jobServiceName = "job-service"
+  dockerBridgeNetwork = "MIP_PRIVATE_NETWORK"
+  networkInterface = "0.0.0.0"
+  webServicesPort = WOKEN_PORT2
+
+  master.router {
+    actors {
+      mining.limit = 5
+      experiment.limit = 5
+    }
+  }
+
+  basicAuth {
+    username = "admin"
+    password = "WoKeN"
+  }
+}
+
+jobs {
+  node = "federation"
+  owner = "admin@mip.chuv.ch"
+  chronosServerUrl = "http://CHRONOS_HOST:CHRONOS_PORT1"
+  featuresDb = "DB_NAME2"
+  featuresTable = "cde_features_a"
+  resultDb = "DB_NAME3"
+  metaDb = "DB_NAME1"
+}
+
+db {
+  woken {
+    jdbc_driver = "org.postgresql.Driver"
+    jdbc_url = "jdbc:postgresql://DB_HOST:DB_PORT/DB_NAME3"
+    host = "DB_HOST"
+    port = DB_PORT
+    user = "DB_USER3"
+    password = "DB_PASSWORD3"
+  }
+
+  features {
+    jdbc_driver = "org.postgresql.Driver"
+    jdbc_url = "jdbc:postgresql://DB_HOST:DB_PORT/DB_NAME2"
+    host = "DB_HOST"
+    port = DB_PORT
+    user = "DB_USER2"
+    password = "DB_PASSWORD2"
+  }
+
+  metadata {
+    jdbc_driver = "org.postgresql.Driver"
+    jdbc_url = "jdbc:postgresql://DB_HOST:DB_PORT/DB_NAME1"
+    host = "DB_HOST"
+    port = DB_PORT
+    user = "DB_USER1"
+    password = "DB_PASSWORD1"
+  }
+}
+
+# The actual Algorithm Library
+algorithms {
+  histograms = {
+    dockerImage = "hbpmip/python-histograms:0.3.6"
+    predictive = false
+  }
+
+  statisticsSummary = {
+    dockerImage = "hbpmip/r-summary-stats:2afe249"
+    predictive = false
+  }
+
+  anova = {
+    dockerImage = "hbpmip/python-anova:0.3.6"
+    predictive = false
+  }
+
+  linearRegression = {
+    dockerImage = "hbpmip/python-linear-regression:0.0.7"
+    predictive = false
+  }
+
+  knn = {
+    dockerImage = "hbpmip/java-rapidminer-knn:0.2.1"
+    predictive = true
+  }
+
+  naiveBayes = {
+    dockerImage = "hbpmip/java-rapidminer-naivebayes:0.2.0"
+    predictive = true
+  }
+
+  tSNE = {
+    dockerImage = "hbpmip/python-tsne:0.3.3"
+    predictive = true
+    maturity = "experimental"
+  }
+
+  ggparci = {
+    dockerImage = "hbpmip/r-ggparci:0.2.0"
+    predictive = false
+    maturity = "experimental"
+  }
+}
