@@ -20,6 +20,13 @@
 # Import settings
 . ./settings.sh
 
+created_network=false
+if ! docker network ls | grep -q ${MIP_PRIVATE_NETWORK}
+then
+	docker network create ${MIP_PRIVATE_NETWORK}
+	created_network=true
+fi
+
 # 1. Create all the DB at once
 echo "Create databases..."
 db_id=$(docker run --rm -d \
@@ -75,3 +82,8 @@ do
 done
 
 docker stop ${db_id}
+
+if ${created_network}
+then
+	docker network rm ${MIP_PRIVATE_NETWORK}
+fi
