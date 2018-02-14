@@ -20,21 +20,30 @@
 # Import settings
 . ./settings.sh
 
-# Permanent storage for Mesos
-mkdir -p ${MESOS_MASTER_LOGS}
-mkdir -p ${MESOS_MASTER_TMP}
-mkdir -p ${MESOS_SLAVE_LOGS}
-mkdir -p ${MESOS_SLAVE_TMP}
+# Following official instructions from:
+#  https://docs.docker.com/install/linux/docker-ce/centos/
 
-# Generate Configuration from templates
-for f in ${WOKEN_CONF} ${WOKEN_VALIDATION_CONF}
-do
-	for v in $(grep '^:' settings.default.sh|cut -c 5- |cut -d: -f1)
-	do
-		eval "t=\"s#${v}#\${${v}}#g\""
-		script="${script}${t};"
-		sed -e "${script}" $f.in > $f
-	done
-done
+# Install docker, for CentOS/RHEL
+sudo yum install -y yum-utils \
+  device-mapper-persistent-data \
+  lvm2
 
-docker-compose $@
+sudo yum-config-manager \
+    --add-repo \
+    https://download.docker.com/linux/centos/docker-ce.repo
+
+# You might be requested to accept the key:
+echo <<EOT
+Docker Repository correct key is:
+  060A 61C5 1B55 8A7F 742B 77AA C52F EB6B 621E 9F35
+
+If prompted, check the key is correct and accept it.
+EOT
+
+sudo yum install docker-ce
+
+sudo systemctl start docker
+
+# Install docker-compose
+sudo curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose

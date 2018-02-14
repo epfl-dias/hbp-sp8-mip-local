@@ -20,21 +20,14 @@
 # Import settings
 . ./settings.sh
 
-# Permanent storage for Mesos
-mkdir -p ${MESOS_MASTER_LOGS}
-mkdir -p ${MESOS_MASTER_TMP}
-mkdir -p ${MESOS_SLAVE_LOGS}
-mkdir -p ${MESOS_SLAVE_TMP}
+# Permanent storage for Portainer
+test -d ${PORTAINER_DATA} \
+	|| mkdir -p ${PORTAINER_DATA} \
+	|| ( echo Failed to create ${PORTAINER_DATA}; exit 1 )
 
-# Generate Configuration from templates
-for f in ${WOKEN_CONF} ${WOKEN_VALIDATION_CONF}
-do
-	for v in $(grep '^:' settings.default.sh|cut -c 5- |cut -d: -f1)
-	do
-		eval "t=\"s#${v}#\${${v}}#g\""
-		script="${script}${t};"
-		sed -e "${script}" $f.in > $f
-	done
-done
-
-docker-compose $@
+sudo docker run -d -p ${PORTAINER_PORT}:9000 \
+	--restart unless-stopped \
+	-v /var/run/docker.sock:/var/run/docker.sock:rw \
+	-v ${PORTAINER_DATA}:/data:rw \
+	--name ${COMPOSE_PROJECT_NAME}_${PORTAINER_HOST} \
+	${PORTAINER_IMAGE}${PORTAINER_VERSION}

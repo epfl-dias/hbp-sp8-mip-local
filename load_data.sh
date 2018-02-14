@@ -20,6 +20,9 @@
 # Import settings
 . ./settings.sh
 
+# 1. Create all the DB at once
+echo "Create databases..."
+
 created_network=false
 if ! docker network ls | grep -q ${MIP_PRIVATE_NETWORK}
 then
@@ -27,13 +30,14 @@ then
 	created_network=true
 fi
 
-# 1. Create all the DB at once
-echo "Create databases..."
-if [ ! -d ${DB_DATA} ]
-then
-	mkdir -p ${DB_DATA}
-	sudo chown -R 999:999 ${DB_DATA}
-fi
+for d in ${DB_DATA} ${DB_DATASETS}
+do
+	if [ ! -d ${d} ]
+	then
+		mkdir -p ${d}
+		sudo chown -R 999:999 ${d}
+	fi
+done
 
 db_id=$(docker run --rm -d \
 	-e POSTGRES_USER="${DB_USER_ADMIN}" \
@@ -56,6 +60,7 @@ do
 	db_list="$db_list $t"
 done
 
+# Make sure Postgres has initialized, should be a while on pgready or something.
 sleep 5
 
 docker run --rm \

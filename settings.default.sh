@@ -82,7 +82,6 @@
 : ${PORTAINER_HOST:="portainer"}
 : ${PORTAINER_PORT:="9000"}
 : ${PORTAINER_DATA:="${PWD}/portainer"}
-: ${PORTAINER_ENABLED:="true"}
 
 #############################################################################
 # Services

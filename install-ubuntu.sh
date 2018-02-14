@@ -20,6 +20,9 @@
 # Import settings
 . ./settings.sh
 
+# Following official instructions from:
+#  https://docs.docker.com/install/linux/docker-ce/ubuntu/
+
 # Install docker, for ubuntu
 sudo apt update
 sudo apt install \
@@ -38,28 +41,3 @@ sudo apt install docker-ce
 # Install docker-compose
 sudo curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
-
-# If requested, setup portainer:
-if ${PORTAINER_ENABLED}
-then
-	# Permanent storage for Portainer
-	mkdir -p ${PORTAINER_DATA}
-
-	sudo docker run -d -p ${PORTAINER_PORT}:9000 \
-		--restart unless-stopped \
-		-v /var/run/docker.sock:/var/run/docker.sock:rw \
-		-v ${PORTAINER_DATA}:/data:rw \
-		--name ${COMPOSE_PROJECT_NAME}_${PORTAINER_HOST} \
-		${PORTAINER_IMAGE}${PORTAINER_VERSION}
-fi
-
-# Permanent storage for the Databases
-mkdir -p ${DB_DATA}
-mkdir -p ${DB_DATASETS}
-sudo chown -R 999:999 ${DB_DATA} ${DB_DATASETS}
-
-# Permanent storage for Mesos
-mkdir -p ${MESOS_MASTER_LOGS}
-mkdir -p ${MESOS_MASTER_TMP}
-mkdir -p ${MESOS_SLAVE_LOGS}
-mkdir -p ${MESOS_SLAVE_TMP}
