@@ -29,6 +29,12 @@ fi
 
 # 1. Create all the DB at once
 echo "Create databases..."
+if [ ! -d ${DB_DATA} ]
+then
+	mkdir -p ${DB_DATA}
+	sudo chown -R 999:999 ${DB_DATA}
+fi
+
 db_id=$(docker run --rm -d \
 	-e POSTGRES_USER="${DB_USER_ADMIN}" \
 	-e POSTGRES_PASSWORD="${DB_PASSWORD_ADMIN}" \
