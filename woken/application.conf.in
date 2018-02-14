@@ -92,7 +92,7 @@ jobs {
   owner = "admin@mip.chuv.ch"
   chronosServerUrl = "http://CHRONOS_HOST:CHRONOS_PORT1"
   featuresDb = "DB_NAME2"
-  featuresTable = "cde_features_a"
+  featuresTable = "WOKEN_MAIN_TABLE"
   resultDb = "DB_NAME3"
   metaDb = "DB_NAME1"
 }

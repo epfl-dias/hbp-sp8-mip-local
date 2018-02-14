@@ -92,9 +92,10 @@
 : ${WOKEN_IMAGE:="hbpmip/woken"}
 : ${WOKEN_VERSION:=":2.1.4"}
 : ${WOKEN_HOST:="woken"}
-: ${WOKEN_CONF:="${PWD}/woken/application.conf"}
 : ${WOKEN_PORT1:="8088"}
 : ${WOKEN_PORT2:="8087"}
+: ${WOKEN_CONF:="${PWD}/woken/application.conf"}
+: ${WOKEN_MAIN_TABLE:="cde_features_a"}
 : ${WOKEN_EXAREME_URL:="http://prozac.madgik.di.uoa.gr:9090/mining/query"}
 
 : ${WOKEN_VALIDATION_IMAGE:="hbpmip/woken-validation"}
