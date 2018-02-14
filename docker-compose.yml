@@ -26,7 +26,7 @@ services:
     image: ${ZOOKEEPER_IMAGE}${ZOOKEEPER_VERSION}
     environment:
       ZOO_MY_ID: 1
-      ZOO_SERVERS: server.1=zookeeper:2888:3888
+      ZOO_SERVERS: server.1=zookeeper:${ZOOKEEPER_PORT2}:${ZOOKEEPER_PORT3}
     restart: unless-stopped # Used only by docker-compose
     deploy:                 # Used only by docker stack
       restart_policy:
@@ -36,15 +36,11 @@ services:
         window: 120s
     networks:
       - local
-#    ports:
-#      - "${ZOOKEEPER_PORT1}:2181"
-#      - "${ZOOKEEPER_PORT2}:2888"
-#      - "${ZOOKEEPER_PORT3}:3888"
 
   mesos-master:
     image: ${MESOS_MASTER_IMAGE}${MESOS_MASTER_VERSION}
     environment:
-      MESOS_PORT: 5050
+      MESOS_PORT: ${MESOS_MASTER_PORT}
       MESOS_ZK: zk://zookeeper:${ZOOKEEPER_PORT1}/mesos
       MESOS_QUORUM: 1
       MESOS_REGISTRY: in_memory
@@ -66,14 +62,12 @@ services:
         window: 120s
     networks:
       - local
-#    ports:
-#      - "${MESOS_MASTER_PORT}:5050"
 
   mesos-slave:
     image: ${MESOS_SLAVE_IMAGE}${MESOS_SLAVE_VERSION}
     environment:
       MESOS_MASTER: zk://zookeeper:${ZOOKEEPER_PORT1}/mesos
-      MESOS_PORT: 5051
+      MESOS_PORT: ${MESOS_SLAVE_PORT}
       MESOS_LOG_DIR: /var/log/mesos
       MESOS_WORK_DIR: /tmp/mesos
       MESOS_CONTAINERIZERS: docker,mesos
@@ -84,7 +78,7 @@ services:
       MESOS_SWITCH_USER: 0
       # see bug resolution for "Failed to determine the hierarchy where the subsystem freezer is attached" at https://github.com/eBayClassifiedsGroup/PanteraS/issues/142
       MESOS_LAUNCHER: "posix"
-#    privileged: true
+    privileged: true
     depends_on:
       - zookeeper
       - mesos-master
@@ -102,15 +96,15 @@ services:
       - ${MESOS_SLAVE_TMP}:/tmp/mesos:rw
     networks:
       - local
-#    ports:
-#      - "${MESOS_SLAVE_PORT}:5051"
 
   chronos:
     image: ${CHRONOS_IMAGE}${CHRONOS_VERSION}
-    command: "--zk_hosts zookeeper:${ZOOKEEPER_PORT1} --master zk://zookeeper:${ZOOKEEPER_PORT1}/mesos --zk_timeout 30000"
-    environment:
-      PORT0: 4400
-      PORT1: 4401
+    #command: "--http_port ${CHRONOS_PORT1} --zk_hosts zookeeper:${ZOOKEEPER_PORT1} --master zk://zookeeper:${ZOOKEEPER_PORT1}/mesos --zk_timeout 30000"
+    command: "/usr/bin/chronos run_jar \
+              --http_port ${CHRONOS_PORT1} \
+              --zk_hosts zookeeper:${ZOOKEEPER_PORT1} --master zk://zookeeper:${ZOOKEEPER_PORT1}/mesos --zk_timeout 30000 \
+              --webui_url http://chronos:${CHRONOS_PORT1}/ --hostname chronos \
+              --failure_retry 5000 --disable_after_failures 1 --cluster_name MIP"
     depends_on:
       - zookeeper
       - mesos-slave
@@ -123,16 +117,13 @@ services:
         window: 120s
     networks:
       - local
-#    ports:
-#      - "${CHRONOS_PORT1}:4400"
-#      - "${CHRONOS_PORT2}:4401"
 
   db:
     image: ${DB_IMAGE}${DB_VERSION}
     environment:
       POSTGRES_USER: ${DB_USER_ADMIN}
       POSTGRES_PASSWORD: ${DB_PASSWORD_ADMIN}
-      PGDATA: "/data/pgdata"
+      PGDATA: "/data/pgdata" # LSC: When using PostgreSQL, make sure it uses the right folder, as mounted below
     restart: unless-stopped # Used only by docker-compose
     deploy:                 # Used only by docker stack
       restart_policy:
@@ -148,11 +139,37 @@ services:
 #    ports:
 #      - "${DB_PORT}:5432"
 
+
+  db-ui:
+    image: ${DB_UI_IMAGE}${DB_UI_VERSION}
+    environment:
+      POSTGRES_HOST: ${DB_HOST}
+      POSTGRES_PORT: ${DB_PORT}
+      POSTGRES_USER: ${DB_USER_ADMIN}
+      POSTGRES_PASSWORD: ${DB_PASSWORD_ADMIN}
+      POSTGRES_DB: ${DB_NAME2}
+    depends_on:
+      - db
+    restart: unless-stopped # Used only by docker-compose
+    deploy:                 # Used only by docker stack
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    volumes:
+      - ${DB_DATA}:/data:rw
+      - ${DB_DATASETS}:/datasets:ro
+    networks:
+      - local
+#    ports: # Expose PostgresRAW-UI only when needed
+#      - "${DB_UI_PORT}:5555"
+
   woken:
     image: ${WOKEN_IMAGE}${WOKEN_VERSION}
     depends_on:
+      - db
       - chronos
-#      - db
     restart: unless-stopped # Used only by docker-compose
     deploy:                 # Used only by docker stack
       restart_policy:
@@ -164,9 +181,6 @@ services:
       - ${WOKEN_CONF}:/opt/woken/config/application.conf:ro
     networks:
       - local
-#    ports:
-#      - "${WOKEN_PORT2}:${WOKEN_PORT2}"
-#      - "${WOKEN_PORT1}:${WOKEN_PORT1}"
 
   woken-validation:
     image: ${WOKEN_VALIDATION_IMAGE}${WOKEN_VALIDATION_VERSION}
@@ -183,8 +197,6 @@ services:
       - ${WOKEN_VALIDATION_CONF}:/opt/woken-validation/config/application.conf:ro
     networks:
       - local
-#    ports:
-#      - "${WOKEN_VALIDATION_PORT}:${WOKEN_VALIDATION_PORT}"
 
   backend:
     image: ${PORTAL_BACKEND_IMAGE}${PORTAL_BACKEND_VERSION}
@@ -193,16 +205,19 @@ services:
       PORTAL_DB_SERVER: ${DB_HOST}:${DB_PORT}
       PORTAL_DB_USER: ${DB_USER4}
       PORTAL_DB_PASSWORD: ${DB_PASSWORD4}
+      PORTAL_DB_SCHEMA: public # Stable Config
       META_DB_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME1}
       META_DB_SERVER: ${DB_HOST}:${DB_PORT}
       META_DB_USER: ${DB_USER1}
       META_DB_PASSWORD: ${DB_PASSWORD1}
+      META_DB_SCHEMA: public # Stable Config
       FEATURES_DB_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME2}
       FEATURES_DB_SERVER: ${DB_HOST}:${DB_PORT}
       FEATURES_DB_USER: ${DB_USER2}
       FEATURES_DB_PASSWORD: ${DB_PASSWORD2}
+      FEATURES_DB_SCHEMA: public # Stable Config
       FEATURES_DB_MAIN_TABLE: ${WOKEN_MAIN_TABLE}
-      CONTEXT_PATH: /services
+      CONTEXT_PATH: ${WOKEN_CONTEXT_PATH} # Stable Config
       AUTHENTICATION: ${PORTAL_BACKEND_AUTHENTICATION}
       CLIENT_ID: ${PORTAL_BACKEND_CLIENT_ID}
       CLIENT_SECRET: ${PORTAL_BACKEND_CLIENT_SECRET}
@@ -213,16 +228,19 @@ services:
       FRONTEND_AFTER_LOGIN_URL: ${PORTAL_FRONTEND_URL}/home
       FRONTEND_AFTER_LOGOUT_URL: ${PORTAL_FRONTEND_URL}/services/login/hbp
       WOKEN_HOST: ${WOKEN_HOST}
-      WOKEN_PORT: ${WOKEN_PORT1}
+      WOKEN_PORT: ${WOKEN_PORT2}
       WOKEN_AKKA_PATH: /user/entrypoint
+      WOKEN_AKKA_PORT: ${WOKEN_AKKA_PORT} # Stable Config
+      WOKEN_URL: http://${WOKEN_HOST}:${WOKEN_PORT2} # Stable Config
       EXAREME_URL: ${WOKEN_EXAREME_URL}
       LOGGING_LEVEL_WEB: DEBUG
       LOGGING_LEVEL_HIBERNATE: WARN
+      #LOGGING_LEVEL_HIBERNATE: DEBUG # Stable Config
       SESSION_TIMEOUT: 2592000
       VIRTUAL_HOST: backend
       VIRTUAL_PORT: 8080
     depends_on:
-#      - db
+      - db
       - woken
     restart: unless-stopped # Used only by docker-compose
     deploy:                 # Used only by docker stack
@@ -233,9 +251,6 @@ services:
         window: 120s
     networks:
       - local
-#    ports:
-#      - "8080:8080"
-#      - "8089:8089"
 
   frontend:
     image: ${PORTAL_FRONTEND_IMAGE}${PORTAL_FRONTEND_VERSION}
@@ -244,7 +259,9 @@ services:
       ERROR_LOG_LEVEL: warn
       PORTAL_VIRTUAL_HOST: frontend
       PORTAL_BACKEND_SERVER: backend:8080
-      PORTAL_BACKEND_CONTEXT: services
+      PORTAL_BACKEND_CONTEXT: ${PORTAL_BACKEND_CONTEXT}
+      ANALYTICS: "False" # Stable Config
+      MIP_VERSION: 2.5.3 # Stable Config
     depends_on:
       - backend
     restart: unless-stopped # Used only by docker-compose
@@ -257,4 +274,5 @@ services:
     networks:
       - local
     ports:
-      - "${PORTAL_FRONTEND_PORT}:80"
+      - "${PORTAL_FRONTEND_PORT1}:80"
+      - "${PORTAL_FRONTEND_PORT2}:443"

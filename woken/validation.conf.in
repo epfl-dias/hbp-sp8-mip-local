@@ -1,4 +1,6 @@
 akka {
+  log-dead-letters = 1
+  log-dead-letters-during-shutdown = off
   loglevel = INFO
 
   actor {
@@ -15,7 +17,6 @@ akka {
     maximum-payload-bytes = 10000000 bytes
     enabled-transports = [ "akka.remote.netty.tcp" ]
     netty.tcp {
-
       hostname = WOKEN_VALIDATION_HOST  # external (logical) hostname
       port = WOKEN_VALIDATION_PORT      # external (logical) port
 
@@ -30,13 +31,8 @@ akka {
   }
 
   cluster {
-    seed-nodes = [ "akka.tcp://woken@WOKEN_HOST:WOKEN_PORT1" ]
+    seed-nodes = [ "akka.tcp://woken@WOKEN_HOST:WOKEN_AKKA_PORT" ]
 
     roles = [ "validation" ]
-
-    #role {
-    #  woken.min-nr-of-members = 1
-    #  validation.min-nr-of-members = 1
-    #}
   }
 }

@@ -27,12 +27,11 @@ akka {
     enabled-transports = [ "akka.remote.netty.tcp" ]
 
     netty.tcp {
-
       hostname = WOKEN_HOST        # external (logical) hostname
-      port = WOKEN_PORT1           # external (logical) port
+      port = WOKEN_AKKA_PORT       # external (logical) port
 
       bind-hostname = localhost    # internal (bind) hostname
-      bind-port = WOKEN_PORT1      # internal (bind) port
+      bind-port = WOKEN_AKKA_PORT  # internal (bind) port
 
       message-frame-size = 10000000b
       send-buffer-size = 10000000b
@@ -42,7 +41,7 @@ akka {
   }
 
   cluster {
-    seed-nodes = [ "akka.tcp://woken@WOKEN_HOST:WOKEN_PORT1" ]
+    seed-nodes = [ "akka.tcp://woken@WOKEN_HOST:WOKEN_AKKA_PORT" ]
 
     roles = [ "woken" ]
   }
@@ -68,6 +67,10 @@ spray.can.host-connector {
 }
 
 app {
+  systemName = "woken" # Needed LS Old version
+  interface = "0.0.0.0" # Needed LS Old version
+  port = WOKEN_PORT2 # Needed LS Old version
+
   clusterSystemName = "woken"
   jobServiceName = "job-service"
   dockerBridgeNetwork = "MIP_PRIVATE_NETWORK"
@@ -88,7 +91,7 @@ app {
 }
 
 jobs {
-  node = "federation"
+  node = "localhost"
   owner = "admin@mip.chuv.ch"
   chronosServerUrl = "http://CHRONOS_HOST:CHRONOS_PORT1"
   featuresDb = "DB_NAME2"
@@ -100,7 +103,11 @@ jobs {
 db {
   woken {
     jdbc_driver = "org.postgresql.Driver"
+    jdbc_jar_path = "/usr/lib/R/libraries/postgresql-9.4-1201.jdbc41.jar"
     jdbc_url = "jdbc:postgresql://DB_HOST:DB_PORT/DB_NAME3"
+    jdbc_user = "DB_USER3"
+    jdbc_password = "DB_PASSWORD3"
+
     host = "DB_HOST"
     port = DB_PORT
     user = "DB_USER3"
@@ -109,7 +116,11 @@ db {
 
   features {
     jdbc_driver = "org.postgresql.Driver"
+    jdbc_jar_path = "/usr/lib/R/libraries/postgresql-9.4-1201.jdbc41.jar"
     jdbc_url = "jdbc:postgresql://DB_HOST:DB_PORT/DB_NAME2"
+    jdbc_user = "DB_USER2"
+    jdbc_password = "DB_PASSWORD2"
+
     host = "DB_HOST"
     port = DB_PORT
     user = "DB_USER2"
@@ -118,11 +129,63 @@ db {
 
   metadata {
     jdbc_driver = "org.postgresql.Driver"
+    jdbc_jar_path = "postgresql-9.4-1201.jdbc41.jar"
     jdbc_url = "jdbc:postgresql://DB_HOST:DB_PORT/DB_NAME1"
+    jdbc_user = "DB_USER1"
+    jdbc_password = "DB_PASSWORD1"
+
     host = "DB_HOST"
     port = DB_PORT
     user = "DB_USER1"
     password = "DB_PASSWORD1"
+  }
+}
+
+defaultSettings { # LSC Whole block for old version
+  # Default settings for the request service
+  request {
+    nodes = {}
+    inDb = "features"
+    outDb = "woken"
+    metaDb = "metadata"
+    mainTable = "WOKEN_MAIN_TABLE"
+
+    functions {
+      histograms = {
+        image = "hbpmip/python-histograms:0.3.6"
+        predictive = false
+      }
+
+      statisticsSummary = {
+        image = "hbpmip/r-summary-stats:2afe249"
+        predictive = false
+      }
+
+      linearRegression = {
+        image = "hbpmip/python-linear-regression:0.0.6"
+        predictive = false
+      }
+
+      anova = {
+        image = "hbpmip/python-anova:0.3.5"
+        predictive = false
+      }
+
+      knn = {
+        image = "hbpmip/java-rapidminer-knn:0.2.1"
+        predictive = true
+      }
+
+      naiveBayes = {
+        image = "hbpmip/java-rapidminer-naivebayes:0.2.0"
+        predictive = true
+      }
+
+      tSNE = {
+        image = "hbpmip/python-tsne:0.3.3"
+        predictive = true
+      }
+    }
   }
 }
 
