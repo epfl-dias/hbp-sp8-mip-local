@@ -224,9 +224,9 @@ services:
       TOKEN_URI: https://services.humanbrainproject.eu/oidc/token
       AUTH_URI: https://services.humanbrainproject.eu/oidc/authorize
       USER_INFO_URI: https://services.humanbrainproject.eu/oidc/userinfo
-      FRONTEND_LOGIN_URL: ${PORTAL_FRONTEND_URL}/services/login/hbp
-      FRONTEND_AFTER_LOGIN_URL: ${PORTAL_FRONTEND_URL}/home
-      FRONTEND_AFTER_LOGOUT_URL: ${PORTAL_FRONTEND_URL}/services/login/hbp
+      FRONTEND_LOGIN_URL: ${PORTAL_FRONTEND_URL}:${PORTAL_FRONTEND_PORT1}/services/login/hbp
+      FRONTEND_AFTER_LOGIN_URL: ${PORTAL_FRONTEND_URL}:${PORTAL_FRONTEND_PORT1}/home
+      FRONTEND_AFTER_LOGOUT_URL: ${PORTAL_FRONTEND_URL}:${PORTAL_FRONTEND_PORT1}/services/login/hbp
       WOKEN_HOST: ${WOKEN_HOST}
       WOKEN_PORT: ${WOKEN_PORT2}
       WOKEN_AKKA_PATH: /user/entrypoint
