@@ -5,8 +5,8 @@
 # Service Parameters
 : ${DB_IMAGE:="hbpmip/postgresraw"}
 : ${DB_VERSION:=":v1.2"}
-: ${DB_HOST:="db"}
-: ${DB_PORT:="5432"}
+: ${DB_HOST:="db"} # External hostname, if exposed
+: ${DB_PORT:="31432"} # External port, if exposed
 : ${DB_DATA:="${PWD}/postgres"}
 : ${DB_DATASETS:="${PWD}/datasets"}
 : ${DB_USER_ADMIN:="postgres"}
@@ -14,7 +14,7 @@
 
 : ${DB_UI_IMAGE:="hbpmip/postgresraw-ui"}
 : ${DB_UI_VERSION:=":v1.4"}
-: ${DB_UI_PORT:="5555"}
+: ${DB_UI_PORT:="31555"} # External port, if exposed
 
 # Databases Definitions:
 #  1. To add a new DB, copy the last 3 lines below and increment the id
