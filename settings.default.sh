@@ -12,10 +12,6 @@
 : ${DB_USER_ADMIN:="postgres"}
 : ${DB_PASSWORD_ADMIN:="test"}
 
-: ${DB_UI_IMAGE:="hbpmip/postgresraw-ui"}
-: ${DB_UI_VERSION:=":v1.4"}
-: ${DB_UI_PORT:="31555"} # External port, if exposed
-
 # Databases Definitions:
 #  1. To add a new DB, copy the last 3 lines below and increment the id
 #  2. Add the new number in DB_CREATE_LIST
@@ -110,6 +106,15 @@
 : ${CHRONOS_PORT1:="4400"}
 : ${CHRONOS_PORT2:="4401"}
 
+#: ${FEATURES_LOCAL_TABLE:="cde_features_a"}
+: ${FEATURES_LOCAL_TABLE:="mip_cde_features"} # Stable Config
+
+: ${DB_UI_IMAGE:="hbpmip/postgresraw-ui"}
+: ${DB_UI_VERSION:=":v1.4"}
+: ${DB_UI_PORT:="31555"} # External port, if exposed
+: ${DB_UI_FEDERATION_SOURCES:="harmonized_clinical_data"}
+: ${DB_UI_LOCAL_SOURCES:="${FEATURES_LOCAL_TABLE} harmonized_clinical_data"}
+
 : ${WOKEN_IMAGE:="hbpmip/woken"}
 #: ${WOKEN_VERSION:=":2.1.4"}
 : ${WOKEN_VERSION:=":2.0.4"} # Stable Config
@@ -118,8 +123,7 @@
 : ${WOKEN_PORT2:="8087"}
 : ${WOKEN_AKKA_PORT:=${WOKEN_PORT1}}
 : ${WOKEN_CONF:="${PWD}/woken/application.conf"}
-#: ${WOKEN_MAIN_TABLE:="cde_features_a"}
-: ${WOKEN_MAIN_TABLE:="mip_cde_features"} # Stable Config
+: ${WOKEN_MAIN_TABLE:="${FEATURES_LOCAL_TABLE}"}
 : ${WOKEN_EXAREME_URL:="http://prozac.madgik.di.uoa.gr:9090/mining/query"}
 #: ${WOKEN_CONTEXT_PATH:="/services"}
 : ${WOKEN_CONTEXT_PATH:=""} # Stable Config
