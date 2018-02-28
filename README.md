@@ -115,5 +115,5 @@ All the settings have default values, but you can change them by either exportin
 Settings are taken in the following order of precedence:
 
   1. Shell Environment, or on the command line
-  2. Federation-specific `settings.local.sh`
+  2. Deployment-specific `settings.local.sh`
   3. Default settings `settings.default.sh`
