@@ -40,10 +40,20 @@ Docker Repository correct key is:
 If prompted, check the key is correct and accept it.
 EOT
 
-sudo yum install docker-ce
+sudo yum install docker-ce-17.12.0.ce-1
+sudo yum install yum-versionlock
+sudo yum versionlock docker-ce
 
 sudo systemctl start docker
 
 # Install docker-compose
 sudo curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
+
+cat <<EOT
+Add you user to the docker group to be able to use the docker command without
+administrator rights or sudo.
+
+  sudo usermod -a -G docker $USER
+
+EOT
