@@ -59,14 +59,15 @@ These scripts deploy the following software:
 
 ## Requirements
 
-- Ubuntu 16.04 system or RHEL 7.3+.
+- Ubuntu 16.04 system or RHEL 7.3+
+- git
 
 ## Deployement
 
 1. Install the software required
 
    ```sh
-   $ sudo install-$OS.sh # OS=ubuntu or OS=redhat, depending on your system
+   $ sudo ./install-$OS.sh # OS=ubuntu or OS=redhat, depending on your system
    ```
 
 2. Configure the platform for anything you wish or need to modify by adding your settings in settings.local.sh
@@ -96,7 +97,7 @@ These scripts deploy the following software:
 
 6. Add in the folder pointed by `${DB_DATASETS}` your CSV files, PostgresRAW will pick the up and create tables you can query right away automatically.
 
-   If your clinical data contains variables used as part of the MIP CDEs, these will be taken into account automatically as long as you name your file `harmonized_clinical_data`.
+   If your clinical data contains variables used as part of the MIP CDEs, these will be taken into account automatically as long as you name your file `harmonized_clinical_data.csv`.
 
 
 **NOTES:** if you set `SHOW_SETTINGS=true` a printout of all the settings which will be used will be printed before doing anything.

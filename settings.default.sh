@@ -4,7 +4,7 @@
 # DATABASES
 # Service Parameters
 : ${DB_IMAGE:="hbpmip/postgresraw"}
-: ${DB_VERSION:=":v1.2"}
+: ${DB_VERSION:=":v1.3"}
 : ${DB_HOST:="db"} # External hostname, if exposed
 : ${DB_PORT:="31432"} # External port, if exposed
 : ${DB_DATA:="${PWD}/postgres"}
@@ -110,10 +110,10 @@
 : ${FEATURES_LOCAL_TABLE:="mip_cde_features"} # Stable Config
 
 : ${DB_UI_IMAGE:="hbpmip/postgresraw-ui"}
-: ${DB_UI_VERSION:=":v1.4"}
+: ${DB_UI_VERSION:=":v1.5"}
 : ${DB_UI_PORT:="31555"} # External port, if exposed
 : ${DB_UI_FEDERATION_SOURCES:="harmonized_clinical_data"}
-: ${DB_UI_LOCAL_SOURCES:="${FEATURES_LOCAL_TABLE} harmonized_clinical_data"}
+: ${DB_UI_LOCAL_SOURCES:="mip_cde_features harmonized_clinical_data"}
 
 : ${WOKEN_IMAGE:="hbpmip/woken"}
 #: ${WOKEN_VERSION:=":2.1.4"}
