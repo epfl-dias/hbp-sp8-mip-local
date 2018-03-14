@@ -1,11 +1,21 @@
 : ${SHOW_SETTINGS:=false}
 
 #############################################################################
+# Global settings
+: ${MIP_PRIVATE_NETWORK:="mip_local"}
+: ${COMPOSE_PROJECT_NAME:="mip"}
+
+: ${PORTAINER_IMAGE:="portainer/portainer"}
+: ${PORTAINER_VERSION:=":latest"}
+: ${PORTAINER_PORT:="9000"}
+: ${PORTAINER_DATA:="${PWD}/portainer"}
+
+#############################################################################
 # DATABASES
 # Service Parameters
 : ${DB_IMAGE:="hbpmip/postgresraw"}
 : ${DB_VERSION:=":v1.3"}
-: ${DB_HOST:="db"} # External hostname, if exposed
+: ${DB_HOST:="db-published"} # External hostname, if exposed
 : ${DB_PORT:="31432"} # External port, if exposed
 : ${DB_DATA:="${PWD}/postgres"}
 : ${DB_DATASETS:="${PWD}/datasets"}
@@ -38,10 +48,6 @@
 # List of databases to create
 : ${DB_CREATE_LIST:="1 2 3 4"}
 
-: ${WOKEN_SETUP_IMAGE:="hbpmip/woken-db-setup"}
-: ${WOKEN_SETUP_VERSION:=":1.0.2"}
-: ${WOKEN_SETUP_DB:=${DB_NAME3}}
-
 #: ${METADATA_SETUP_IMAGE:="hbpmip/sample-meta-db-setup"}
 #: ${METADATA_SETUP_VERSION:=":0.4.0"}
 : ${METADATA_SETUP_IMAGE:="hbpmip/mip-cde-meta-db-setup"} # Stable Config
@@ -65,22 +71,17 @@
 : ${PPMI_SETUP_VERSION:=":1.0.2"}
 : ${PPMI_SETUP_DB:=${DB_NAME2}}
 
+: ${WOKEN_SETUP_IMAGE:="hbpmip/woken-db-setup"}
+: ${WOKEN_SETUP_VERSION:=":1.0.2"}
+: ${WOKEN_SETUP_DB:=${DB_NAME3}}
+
 # List of databases to populate
 #: ${DB_SETUP_LIST:="WOKEN_SETUP METADATA_SETUP SAMPLE_SETUP"}
 : ${DB_SETUP_LIST:="WOKEN_SETUP METADATA_SETUP ADNI_MERGE_SETUP EDSD_SETUP PPMI_SETUP"} # Stable Config
 
-#############################################################################
-: ${MIP_PRIVATE_NETWORK:="mip_local"}
-: ${COMPOSE_PROJECT_NAME:="mip"}
-
-: ${PORTAINER_IMAGE:="portainer/portainer"}
-: ${PORTAINER_VERSION:=":latest"}
-: ${PORTAINER_HOST:="portainer"}
-: ${PORTAINER_PORT:="9000"}
-: ${PORTAINER_DATA:="${PWD}/portainer"}
 
 #############################################################################
-# Services
+# Local Services
 : ${ZOOKEEPER_IMAGE:="zookeeper"}
 : ${ZOOKEEPER_VERSION:=":3.4.11"}
 : ${ZOOKEEPER_PORT1:="2181"}

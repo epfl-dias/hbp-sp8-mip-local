@@ -30,5 +30,5 @@ docker run -d \
 	--restart unless-stopped \
 	--mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
 	--mount type=bind,src=${PORTAINER_DATA},dst=/data \
-	--name ${COMPOSE_PROJECT_NAME}_${PORTAINER_HOST} \
+	--name ${COMPOSE_PROJECT_NAME}_portainer \
 	${PORTAINER_IMAGE}${PORTAINER_VERSION}
