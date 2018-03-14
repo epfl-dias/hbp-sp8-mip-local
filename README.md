@@ -82,6 +82,13 @@ These scripts deploy the following software:
 
 4. Load the research data into the `LDSM`
 
+   If you intend to load the research data stored on gitlab (adni, edsd and ppmi datasets), login first:
+
+   ```sh
+   $ docker login registry.gitlab.com
+   ```
+   Then
+
    ```sh
    $ ./load_data.sh
    ```
