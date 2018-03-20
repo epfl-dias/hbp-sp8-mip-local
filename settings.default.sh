@@ -14,7 +14,7 @@
 # DATABASES
 # Service Parameters
 : ${DB_IMAGE:="hbpmip/postgresraw"}
-: ${DB_VERSION:=":v1.3"}
+: ${DB_VERSION:=":v1.4"}
 # If you want to expose the DB, you have to adapt the values below, as well
 # as uncomment the port section in the docker-compose.yml file.
 : ${DB_HOST:="db"} # Internal hostname, if NOT exposed, defined in docker-compose.yml
