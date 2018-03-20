@@ -143,8 +143,8 @@ services:
   db-ui:
     image: ${DB_UI_IMAGE}${DB_UI_VERSION}
     environment:
-      POSTGRES_HOST: db
-      POSTGRES_PORT: 5432
+      POSTGRES_HOST: ${DB_HOST}
+      POSTGRES_PORT: ${DB_PORT}
       POSTGRES_USER: ${DB_USER_ADMIN}
       POSTGRES_PASSWORD: ${DB_PASSWORD_ADMIN}
       POSTGRES_DB: ${DB_NAME2}
@@ -203,18 +203,18 @@ services:
   backend:
     image: ${PORTAL_BACKEND_IMAGE}${PORTAL_BACKEND_VERSION}
     environment:
-      PORTAL_DB_URL: jdbc:postgresql://db:5432/${DB_NAME4}
-      PORTAL_DB_SERVER: db:5432
+      PORTAL_DB_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME4}
+      PORTAL_DB_SERVER: ${DB_HOST}:${DB_PORT}
       PORTAL_DB_USER: ${DB_USER4}
       PORTAL_DB_PASSWORD: ${DB_PASSWORD4}
       PORTAL_DB_SCHEMA: public # Stable Config
-      META_DB_URL: jdbc:postgresql://db:5432/${DB_NAME1}
-      META_DB_SERVER: db:5432
+      META_DB_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME1}
+      META_DB_SERVER: ${DB_HOST}:${DB_PORT}
       META_DB_USER: ${DB_USER1}
       META_DB_PASSWORD: ${DB_PASSWORD1}
       META_DB_SCHEMA: public # Stable Config
-      FEATURES_DB_URL: jdbc:postgresql://db:5432/${DB_NAME2}
-      FEATURES_DB_SERVER: db:5432
+      FEATURES_DB_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME2}
+      FEATURES_DB_SERVER: ${DB_HOST}:${DB_PORT}
       FEATURES_DB_USER: ${DB_USER2}
       FEATURES_DB_PASSWORD: ${DB_PASSWORD2}
       FEATURES_DB_SCHEMA: public # Stable Config
