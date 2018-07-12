@@ -136,8 +136,8 @@ services:
       - ${DB_DATASETS}:/datasets:ro
     networks:
       - local
-#    ports:
-#      - "${DB_PORT}:5432"
+    ports:
+      - "${DB_PORT}:5432"
 
 
   db-ui:
@@ -164,8 +164,8 @@ services:
       - ${DB_DATASETS}:/datasets:ro
     networks:
       - local
-#    ports: # Expose PostgresRAW-UI only when needed
-#      - "${DB_UI_PORT}:5555"
+    ports: # Expose PostgresRAW-UI only when needed
+      - "${DB_UI_PORT}:5555"
 
   woken:
     image: ${WOKEN_IMAGE}${WOKEN_VERSION}
